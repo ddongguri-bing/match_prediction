@@ -37,8 +37,6 @@ export function PredictionApp() {
   const [booting, setBooting] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  console.log("테스트");
-
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 1000);
     return () => window.clearInterval(timer);
