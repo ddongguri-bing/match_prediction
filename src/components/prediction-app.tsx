@@ -10,7 +10,7 @@ import { HistoryView } from "@/components/history-view";
 import { AdminLoginView, LoginView } from "@/components/login-view";
 import { TodayView } from "@/components/today-view";
 import { api } from "@/lib/api-client";
-import { formatIso, type PickSide, type Store } from "@/lib/domain";
+import { type PickSide, type Store } from "@/lib/domain";
 
 type Session =
   | { role: "member"; memberId: string; name: string }
@@ -19,16 +19,16 @@ type Session =
 type MemberTab = "today" | "history";
 type AdminTab = "rank" | "games" | "members";
 
-const emptyStore = (today = formatIso(new Date())): Store => ({
-  today,
+const emptyStore = (): Store => ({
+  today: "",
   members: [],
   games: [],
   predictions: [],
 });
 
 export function PredictionApp() {
-  const [now, setNow] = useState(() => new Date());
-  const [store, setStore] = useState<Store>(() => emptyStore());
+  const [now, setNow] = useState<Date | null>(null);
+  const [store, setStore] = useState<Store>(emptyStore);
   const [session, setSession] = useState<Session>(null);
   const [gate, setGate] = useState<"member" | "admin">("member");
   const [memberTab, setMemberTab] = useState<MemberTab>("today");
@@ -38,8 +38,13 @@ export function PredictionApp() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const timer = window.setInterval(() => setNow(new Date()), 1000);
-    return () => window.clearInterval(timer);
+    const tick = () => setNow(new Date());
+    const immediate = window.setTimeout(tick, 0);
+    const timer = window.setInterval(tick, 1000);
+    return () => {
+      window.clearTimeout(immediate);
+      window.clearInterval(timer);
+    };
   }, []);
 
   useEffect(() => {
@@ -327,7 +332,7 @@ export function PredictionApp() {
           ]
         : [];
 
-  if (booting) {
+  if (booting || !now) {
     return <div className="min-h-dvh bg-canvas" />;
   }
 
