@@ -153,6 +153,12 @@ export async function DELETE(request: Request) {
     if (!id) throw new Error("경기를 찾을 수 없습니다.");
 
     const sb = getSupabaseAdmin();
+    const { error: predictionError } = await sb
+      .from("predictions")
+      .delete()
+      .eq("game_id", id);
+    if (predictionError) throw new Error(predictionError.message);
+
     const { error } = await sb.from("games").delete().eq("id", id);
     if (error) throw new Error(error.message);
     return Response.json({ ok: true });
