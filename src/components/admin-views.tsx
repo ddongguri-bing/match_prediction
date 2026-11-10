@@ -14,7 +14,14 @@ import {
   type PickSide,
   type Store,
 } from "@/lib/domain";
-import { Button, Card, ErrorText, Field, Label, SectionTitle } from "@/components/ui";
+import {
+  Button,
+  Card,
+  ErrorText,
+  Field,
+  Label,
+  SectionTitle,
+} from "@/components/ui";
 
 const rankTone = ["text-[#d4a017]", "text-[#8d99a6]", "text-[#b0703c]"];
 
@@ -38,18 +45,27 @@ export function AdminRankView({ store }: { store: Store }) {
           <tbody>
             {rows.map((row) => (
               <tr key={row.member.id} className="border-t border-line">
-                <td className={`px-2 py-3 font-extrabold ${rankTone[row.rank - 1] ?? ""}`}>{row.rank}</td>
+                <td
+                  className={`px-2 py-3 font-extrabold ${rankTone[row.rank - 1] ?? ""}`}>
+                  {row.rank}
+                </td>
                 <td className="px-2 py-3">{row.member.name}</td>
-                <td className="px-2 py-3 text-right font-bold tabular-nums">{row.points}</td>
-                <td className="px-2 py-3 text-right tabular-nums">{row.hits}</td>
-                <td className="px-2 py-3 text-right tabular-nums">{row.streak}</td>
+                <td className="px-2 py-3 text-right font-bold tabular-nums">
+                  {row.points}
+                </td>
+                <td className="px-2 py-3 text-right tabular-nums">
+                  {row.hits}
+                </td>
+                <td className="px-2 py-3 text-right tabular-nums">
+                  {row.streak}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
       <p className="text-center text-[13px] leading-6 text-sub">
-        참여 1점 · 성공 +2점 · 실패 +0점
+        참여 +1점 · 성공 +2점 · 실패 +0점
         <br />
         연속 성공 10경기마다 +5점 · 우천 취소는 점수 없음(연속 유지)
       </p>
@@ -60,8 +76,15 @@ export function AdminRankView({ store }: { store: Store }) {
 type GameManageProps = {
   store: Store;
   now: Date;
-  onAddGame: (input: { date: string; time: string; opponent: string }) => Promise<string | null>;
-  onUpdateGame: (id: string, patch: { date: string; time: string; opponent: string }) => Promise<string | null>;
+  onAddGame: (input: {
+    date: string;
+    time: string;
+    opponent: string;
+  }) => Promise<string | null>;
+  onUpdateGame: (
+    id: string,
+    patch: { date: string; time: string; opponent: string },
+  ) => Promise<string | null>;
   onDeleteGame: (id: string) => void;
   onSetResult: (id: string, result: PickSide) => void;
   onSetRain: (id: string) => void;
@@ -75,7 +98,9 @@ type MemberManageProps = {
 };
 
 export function AdminGamesView(props: GameManageProps) {
-  const games = [...props.store.games].sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time));
+  const games = [...props.store.games].sort((a, b) =>
+    (b.date + b.time).localeCompare(a.date + a.time),
+  );
 
   return (
     <>
@@ -98,7 +123,11 @@ export function AdminGamesView(props: GameManageProps) {
   );
 }
 
-export function AdminMembersView({ store, onResetPin, onDeleteMember }: MemberManageProps) {
+export function AdminMembersView({
+  store,
+  onResetPin,
+  onDeleteMember,
+}: MemberManageProps) {
   return (
     <>
       <SectionTitle>회원 {store.members.length}명</SectionTitle>
@@ -127,8 +156,18 @@ function AddGameForm({ onAdd }: { onAdd: GameManageProps["onAddGame"] }) {
       <SectionTitle>경기 일정 등록</SectionTitle>
       <Card>
         <div className="grid grid-cols-2 gap-2">
-          <Field type="date" value={date} aria-label="날짜" onChange={(event) => setDate(event.target.value)} />
-          <Field type="time" value={time} aria-label="시간" onChange={(event) => setTime(event.target.value)} />
+          <Field
+            type="date"
+            value={date}
+            aria-label="날짜"
+            onChange={(event) => setDate(event.target.value)}
+          />
+          <Field
+            type="time"
+            value={time}
+            aria-label="시간"
+            onChange={(event) => setTime(event.target.value)}
+          />
         </div>
         <Label>상대팀</Label>
         <Field
@@ -148,8 +187,7 @@ function AddGameForm({ onAdd }: { onAdd: GameManageProps["onAddGame"] }) {
                 setOpponent("");
               }
             })();
-          }}
-        >
+          }}>
           일정 등록
         </Button>
         <ErrorText>{error}</ErrorText>
@@ -171,7 +209,10 @@ function GameRow({
   game: Game;
   today: string;
   now: Date;
-} & Pick<GameManageProps, "onUpdateGame" | "onDeleteGame" | "onSetResult" | "onSetRain" | "onReopen">) {
+} & Pick<
+  GameManageProps,
+  "onUpdateGame" | "onDeleteGame" | "onSetResult" | "onSetRain" | "onReopen"
+>) {
   const [editing, setEditing] = useState(false);
   const [date, setDate] = useState(game.date);
   const [time, setTime] = useState(game.time);
@@ -197,22 +238,38 @@ function GameRow({
       {editing ? (
         <div className="mt-3">
           <div className="grid grid-cols-2 gap-2">
-            <Field type="date" value={date} aria-label="날짜 수정" onChange={(event) => setDate(event.target.value)} />
-            <Field type="time" value={time} aria-label="시간 수정" onChange={(event) => setTime(event.target.value)} />
+            <Field
+              type="date"
+              value={date}
+              aria-label="날짜 수정"
+              onChange={(event) => setDate(event.target.value)}
+            />
+            <Field
+              type="time"
+              value={time}
+              aria-label="시간 수정"
+              onChange={(event) => setTime(event.target.value)}
+            />
           </div>
           <Label>상대팀</Label>
-          <Field value={opponent} onChange={(event) => setOpponent(event.target.value)} />
+          <Field
+            value={opponent}
+            onChange={(event) => setOpponent(event.target.value)}
+          />
           <div className="mt-3 flex gap-2">
             <Button
               variant="small"
               onClick={() => {
                 void (async () => {
-                  const message = await onUpdateGame(game.id, { date, time, opponent });
+                  const message = await onUpdateGame(game.id, {
+                    date,
+                    time,
+                    opponent,
+                  });
                   setError(message ?? "");
                   if (!message) setEditing(false);
                 })();
-              }}
-            >
+              }}>
               수정 저장
             </Button>
             <Button variant="smallGhost" onClick={() => setEditing(false)}>
@@ -228,9 +285,9 @@ function GameRow({
           <Button
             variant="smallGhost"
             onClick={() => {
-              if (window.confirm("이 경기를 삭제할까요?")) onDeleteGame(game.id);
-            }}
-          >
+              if (window.confirm("이 경기를 삭제할까요?"))
+                onDeleteGame(game.id);
+            }}>
             삭제
           </Button>
         </div>
@@ -254,10 +311,11 @@ function GameRow({
                 type="button"
                 aria-pressed={result === side}
                 className={`rounded-[10px] border-[1.5px] py-2 text-[13px] font-bold ${
-                  result === side ? "border-brand bg-brand text-white" : "border-line bg-white"
+                  result === side
+                    ? "border-brand bg-brand text-white"
+                    : "border-line bg-white"
                 }`}
-                onClick={() => setResult(side)}
-              >
+                onClick={() => setResult(side)}>
                 {PICK_LABEL[side]}
               </button>
             ))}
@@ -272,8 +330,7 @@ function GameRow({
                 }
                 setError("");
                 onSetResult(game.id, result);
-              }}
-            >
+              }}>
               결과 저장
             </Button>
             <Button variant="smallGhost" onClick={() => onSetRain(game.id)}>
@@ -306,7 +363,11 @@ function GameRow({
 
 function StatusTag({ game }: { game: Game }) {
   if (game.status === "rain") {
-    return <span className="rounded-full bg-[#e6f0fb] px-2 py-1 text-xs font-bold text-[#2563a8]">우천</span>;
+    return (
+      <span className="rounded-full bg-[#e6f0fb] px-2 py-1 text-xs font-bold text-[#2563a8]">
+        우천
+      </span>
+    );
   }
   if (game.status === "final" && game.result) {
     return (
@@ -315,7 +376,11 @@ function StatusTag({ game }: { game: Game }) {
       </span>
     );
   }
-  return <span className="rounded-full bg-canvas px-2 py-1 text-xs font-bold text-sub">예정</span>;
+  return (
+    <span className="rounded-full bg-canvas px-2 py-1 text-xs font-bold text-sub">
+      예정
+    </span>
+  );
 }
 
 function MemberRow({
@@ -337,9 +402,9 @@ function MemberRow({
         <Button
           variant="smallGhost"
           onClick={() => {
-            if (window.confirm(`${member.name} 회원을 삭제할까요?`)) onDelete(member.id);
-          }}
-        >
+            if (window.confirm(`${member.name} 회원을 삭제할까요?`))
+              onDelete(member.id);
+          }}>
           삭제
         </Button>
       </div>
@@ -351,7 +416,9 @@ function MemberRow({
           maxLength={6}
           placeholder="새 비밀번호 4~6자리"
           aria-label={`${member.name} 새 비밀번호`}
-          onChange={(event) => setPin(event.target.value.replace(/\D/g, "").slice(0, 6))}
+          onChange={(event) =>
+            setPin(event.target.value.replace(/\D/g, "").slice(0, 6))
+          }
         />
         <Button
           variant="small"
@@ -366,8 +433,7 @@ function MemberRow({
               setError(message ?? "");
               if (!message) setPin("");
             })();
-          }}
-        >
+          }}>
           변경
         </Button>
       </div>
