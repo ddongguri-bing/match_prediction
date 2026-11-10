@@ -287,7 +287,7 @@ function GameRow({
         <p className="mt-3 text-[13px] text-sub">
           {game.date > today
             ? "경기일 이후에 결과를 입력할 수 있어요."
-            : "18:00 이후에 결과를 입력할 수 있어요."}
+            : "경기 시작 4시간 이후에 결과를 입력할 수 있어요."}
         </p>
       ) : null}
 

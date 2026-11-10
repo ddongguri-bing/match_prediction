@@ -4,8 +4,10 @@ import { useState } from "react";
 import {
   PICK_LABEL,
   PICKS,
+  formatClock,
   isPredictionClosed,
   monthDay,
+  predictionDeadline,
   weekday,
   type Game,
   type PickSide,
@@ -32,7 +34,7 @@ export function TodayView({ games, predictions, now, onSave }: TodayViewProps) {
           key={game.id}
           game={game}
           prediction={predictions.find((item) => item.gameId === game.id)}
-          closed={isPredictionClosed(now)}
+          now={now}
           onSave={onSave}
         />
       ))}
@@ -43,16 +45,18 @@ export function TodayView({ games, predictions, now, onSave }: TodayViewProps) {
 function TodayGame({
   game,
   prediction,
-  closed,
+  now,
   onSave,
 }: {
   game: Game;
   prediction?: Prediction;
-  closed: boolean;
+  now: Date;
   onSave: (gameId: string, pick: PickSide) => void;
 }) {
   const [pick, setPick] = useState<PickSide | null>(prediction?.pick ?? null);
   const [error, setError] = useState("");
+  const closed = isPredictionClosed(game, now);
+  const deadline = formatClock(predictionDeadline(game));
 
   if (game.status === "rain") {
     return <Notice>아쉽지만 오늘은 우천 취소가 됐어요.</Notice>;
@@ -84,7 +88,9 @@ function TodayGame({
         </p>
       ) : (
         <>
-          <p className="mt-3 text-center text-[13px] text-sub">18:00까지 예측 가능</p>
+          <p className="mt-3 text-center text-[13px] text-sub">
+            {deadline}까지 예측 가능 · 경기 30분 전 마감
+          </p>
           <div className="mt-3 grid grid-cols-3 gap-2">
             {PICKS.map((side) => {
               const selected = pick === side;

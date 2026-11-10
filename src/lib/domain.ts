@@ -65,17 +65,30 @@ export function weekday(iso: string) {
   return "일월화수목금토"[new Date(year, month - 1, day).getDay()];
 }
 
-/** 18:00:00까지 열려 있고, 18:00:01부터 닫힌다. */
-export function isPredictionClosed(now: Date) {
-  const close = new Date(now);
-  close.setHours(18, 0, 1, 0);
-  return now.getTime() >= close.getTime();
+/** 경기 시작 시각 (로컬). time은 HH:MM 또는 HH:MM:SS. */
+export function gameStartAt(game: Pick<Game, "date" | "time">) {
+  const [year, month, day] = game.date.slice(0, 10).split("-").map(Number);
+  const [hour, minute] = game.time.split(":").map(Number);
+  return new Date(year, month - 1, day, hour || 0, minute || 0, 0, 0);
 }
 
-export function canEnterResult(game: Game, today: string, now: Date) {
-  if (game.date < today) return true;
-  if (game.date > today) return false;
-  return isPredictionClosed(now);
+/** 예측 마감: 경기 시작 30분 전. 이 시각부터 닫힌다. */
+export function predictionDeadline(game: Pick<Game, "date" | "time">) {
+  return new Date(gameStartAt(game).getTime() - 30 * 60 * 1000);
+}
+
+export function isPredictionClosed(game: Pick<Game, "date" | "time">, now: Date) {
+  return now.getTime() >= predictionDeadline(game).getTime();
+}
+
+export function formatClock(date: Date) {
+  return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+}
+
+/** 결과 입력: 경기 시작 4시간 이후부터 가능. */
+export function canEnterResult(game: Game, _today: string, now: Date) {
+  const openAt = new Date(gameStartAt(game).getTime() + 4 * 60 * 60 * 1000);
+  return now.getTime() >= openAt.getTime();
 }
 
 export function isHit(result: PickSide, pick: PickSide) {
